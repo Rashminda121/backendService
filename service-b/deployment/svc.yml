@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-b-demo
+  namespace: demo-namespace-b
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3001
+    protocol: TCP
+  selector:
+    app: service-b-demo

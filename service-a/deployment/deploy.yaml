@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-a-deployment
+  namespace: demo-namespace-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-a-demo
+  template:
+    metadata:
+      labels:
+        app: service-a-demo
+    spec:
+      containers:
+      - name: service-a-demo
+        image: hishmath/nest-demo-service-a:0.0.1
+        ports:
+        - containerPort: 3000
