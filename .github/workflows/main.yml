@@ -30,15 +30,15 @@
 
 #     - name: Build Docker Image
 #       run: |
-#         docker build . -t hishmath/nest-demo-service-a:${{ env.VERSION }}
+#         docker build . -t hishmath/nest-demo-service:${{ env.VERSION }}
 
 #     - name: Push Docker Image
 #       run: |
-#         docker push hishmath/nest-demo-service-a:${{ env.VERSION }}
+#         docker push hishmath/nest-demo-service:${{ env.VERSION }}
 
 #     - name: Update K8s Manifests
 #       run: |
-#         sed -i "s|image: hishmath/nest-demo-service-a:.*|image: hishmath/nest-demo-service-a:${{ env.VERSION }}|g" deployment/deploy.yaml
+#         sed -i "s|image: hishmath/nest-demo-service:.*|image: hishmath/nest-demo-service-a:${{ env.VERSION }}|g" deployment/deploy.yaml
 
 #     - name: Commit the changes of deployment file
 #       run: |
