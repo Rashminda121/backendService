@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -25,7 +25,7 @@ async function bootstrap() {
     }),
   });
 
-  await app.listen(3001);
+  await app.listen(3001, '0.0.0.0');
   Logger.log('Service B is running on port 3001');
 }
 

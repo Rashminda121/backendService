@@ -7,7 +7,12 @@ export class AppController {
 
   constructor(private readonly appService: AppService) {}
 
-  @Get("hello-service-b")
+  @Get('/')
+  getRootMessage() {
+    return { message: 'Hello, World! from service-b' };
+  }
+
+  @Get('hello-service-b')
   getHello(): string {
     return this.appService.getHello();
   }

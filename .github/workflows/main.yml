@@ -1,60 +1,8 @@
-# name: Service A CI Pipeline
-
-# on:
-#   push:
-#     branches:
-#     - main
-
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v3
-
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-
-#     - name: Log in to Docker Hub
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKER_USERNAME }}
-#         password: ${{ secrets.DOCKER_PASSWORD }}
-
-#     - name: Docker tag
-#       id: version
-#       run: |
-#         export VERSION=$(grep -oP '"version":\s*"\K[0-9\.]+' package.json)
-#         echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-#     - name: Build Docker Image
-#       run: |
-#         docker build . -t hishmath/nest-demo-service:${{ env.VERSION }}
-
-#     - name: Push Docker Image
-#       run: |
-#         docker push hishmath/nest-demo-service:${{ env.VERSION }}
-
-#     - name: Update K8s Manifests
-#       run: |
-#         sed -i "s|image: hishmath/nest-demo-service:.*|image: hishmath/nest-demo-service-a:${{ env.VERSION }}|g" deployment/deploy.yaml
-
-#     - name: Commit the changes of deployment file
-#       run: |
-#         git config --global user.email "<mailtohdeen@gmail.com>"
-#         git config --global user.name "GitHub Actions Bot"
-#         git add *
-#         git commit -m "Update deploy.yaml with new image version - ${{ env.VERSION }}"
-#         git remote set-url origin https://github-actions:${{ secrets.GH_TOKEN }}@github.com/Hishmathdeen/nest-demo-service-a.git
-#         git push origin main
-
 name: Deploy Services to Kubernetes
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -75,20 +23,17 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          IMAGE_TAG=$(date +%s)
 
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/service-a:$IMAGE_TAG -f service-a/Dockerfile service-a
-          docker push ${{ secrets.DOCKER_USERNAME }}/service-a:$IMAGE_TAG
+          docker build --no-cache -t felixjayamuni/service-a:latest -f ./service-a/Dockerfile ./service-a
+          docker push felixjayamuni/service-a:latest
 
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/service-b:$IMAGE_TAG -f service-b/Dockerfile service-b
-          docker push ${{ secrets.DOCKER_USERNAME }}/service-b:$IMAGE_TAG
-
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          docker build --no-cache -t felixjayamuni/service-b:latest -f ./service-b/Dockerfile ./service-b
+          docker push felixjayamuni/service-b:latest
 
       - name: Update Kubernetes manifests with new image
         run: |
-          sed -i "s|felixjayamuni/service-a:latest|${{ secrets.DOCKER_USERNAME }}/service-a:$IMAGE_TAG|g" k8s/service-a-deployment.yml
-          sed -i "s|felixjayamuni/service-b:latest|${{ secrets.DOCKER_USERNAME }}/service-b:$IMAGE_TAG|g" k8s/service-b-deployment.yml
+          sed -i "s|felixjayamuni/service-a:latest|felixjayamuni/service-a:latest|g" k8s/service-a-deployment.yml
+          sed -i "s|felixjayamuni/service-b:latest|felixjayamuni/service-b:latest|g" k8s/service-b-deployment.yml
 
       - name: Commit and push updated manifests
         env:
@@ -97,19 +42,19 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
           git add k8s/service-a-deployment.yml k8s/service-b-deployment.yml
-          git commit -m "Updated images to $IMAGE_TAG"
+          git commit -m "Updated images to latest"
           git push
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      # - name: Set up kubectl
+      #   uses: azure/setup-kubectl@v3
 
-      - name: Configure Kubeconfig
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
+      # - name: Configure Kubeconfig
+      #   run: |
+      #     echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
 
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/service-a-deployment.yml
-          kubectl apply -f k8s/service-a-service.yml
-          kubectl apply -f k8s/service-b-deployment.yml
-          kubectl apply -f k8s/service-b-service.yml
+      # - name: Deploy to Kubernetes
+      #   run: |
+      #     kubectl apply -f k8s/service-a-deployment.yml
+      #     kubectl apply -f k8s/service-a-service.yml
+      #     kubectl apply -f k8s/service-b-deployment.yml
+      #     kubectl apply -f k8s/service-b-service.yml
