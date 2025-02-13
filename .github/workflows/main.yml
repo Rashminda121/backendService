@@ -30,20 +30,20 @@ jobs:
           docker build --no-cache -t felixjayamuni/service-b:latest -f ./service-b/Dockerfile ./service-b
           docker push felixjayamuni/service-b:latest
 
-      - name: Update Kubernetes manifests with new image
-        run: |
-          sed -i "s|felixjayamuni/service-a:latest|felixjayamuni/service-a:latest|g" k8s/service-a-deployment.yml
-          sed -i "s|felixjayamuni/service-b:latest|felixjayamuni/service-b:latest|g" k8s/service-b-deployment.yml
+      # - name: Update Kubernetes manifests with new image
+      #   run: |
+      #     sed -i "s|felixjayamuni/service-a:latest|felixjayamuni/service-a:latest|g" k8s/service-a-deployment.yml
+      #     sed -i "s|felixjayamuni/service-b:latest|felixjayamuni/service-b:latest|g" k8s/service-b-deployment.yml
 
-      - name: Commit and push updated manifests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "GitHub Actions"
-          git add k8s/service-a-deployment.yml k8s/service-b-deployment.yml
-          git commit -m "Updated images to latest"
-          git push
+      # - name: Commit and push updated manifests
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git config --global user.name "GitHub Actions"
+      #     git add k8s/service-a-deployment.yml k8s/service-b-deployment.yml
+      #     git commit -m "Updated images to latest"
+      #     git push
 
       # - name: Set up kubectl
       #   uses: azure/setup-kubectl@v3
